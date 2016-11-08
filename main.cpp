@@ -351,8 +351,8 @@ m_Vector HemisphereSampling(m_Vector m_normal)
 
 	double gamma1 = GenerateRandomFloat(0.0, 1.0);
 	double gamma2 = GenerateRandomFloat(0.0, 1.0);
-	double r = sqrt(1.0 - m_RND_2 * gamma2);
-	double phi = 2.0 * m_PI * gamma2;
+	double r = sqrt(1.0 - m_RND_2 * m_RND_2);
+	double phi = 2.0 * m_PI * m_RND_2;
 
 
 	double vx = cos(phi) * r;
