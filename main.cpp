@@ -67,7 +67,7 @@ const double m_eps=1e-6;
 //    Number of Samples per Pixel
 // -----------------------------------------
 const int m_pixmap_width = 155, m_pixmap_height = 155;
-const double m_samples_per_pixel = 10;
+const double m_samples_per_pixel = 500;
 
 using namespace std;
 
@@ -348,9 +348,16 @@ m_Vector HemisphereSampling(m_Vector m_normal)
 // Tip: use m_RND_2 for Xi_1 and Xi_2
 //
 // =================================================================
-	double vx = // YOUR CODE HERE
-	double vy = // YOUR CODE HERE
-	double vz = // YOUR CODE HERE
+
+	double gamma1 = GenerateRandomFloat(0.0, 1.0);
+	double gamma2 = GenerateRandomFloat(0.0, 1.0);
+	double r = sqrt(1.0 - m_RND_2 * gamma2);
+	double phi = 2.0 * m_PI * gamma2;
+
+
+	double vx = cos(phi) * r;
+	double vy = sin(phi) * r;
+	double vz = m_RND_2;
 	m_Vector sampled_ray_direction = m_Vector(vx, vy, vz);
 
 	// Now we build an otrhotnormal frame system
@@ -476,8 +483,8 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 	//
 	// =================================================================
 
-	double ktot = // YOUR CODE HERE
-	double m_random_float = // YOUR CODE HERE
+	double ktot =  intersection.object->kd + intersection.object->ks + intersection.object->emission;
+	double m_random_float = GenerateRandomFloat(0, ktot);
 
 	if (m_random_float < intersection.object->kd) // send a diffuse ray
 	{
@@ -495,7 +502,7 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 		// Slides #26 and #27
 		// =========================================================================
 
-		ray.direction = // YOUR CODE HERE
+		ray.direction = HemisphereSampling(intersection.object->normal(hit_point));
 
 		double cosine_t = ray.direction.DotProduct(normal_at_hit_point);
 		m_Vector tmp;
@@ -708,8 +715,8 @@ int main() {
 				// Slide #20
 				//
 				// =================================================================
-				camera.x = // YOUR CODE HERE
-				camera.y = // YOUR CODE HERE
+				camera.x = camera.x + (m_RND_2/1000);
+				camera.y = camera.y + (m_RND_2/1000);
 
 				// Ray Direction: point from the origin to the camera plane
 				ray.direction = (camera - ray.origin).Normalize();
