@@ -41,13 +41,13 @@
 std::mt19937 MersenneTwisterPRNG;
 
 // Uniform real distribution
-// Random number distribution that produces floating-point values according to a uniform distribution, 
+// Random number distribution that produces floating-point values according to a uniform distribution,
 // which is described by the following probability density function (...) - more details here:
 // http://www.cplusplus.com/reference/random/uniform_real_distribution/
 
 std::uniform_real_distribution<double> m_URD;
 
-// Hemisphere sampling (i.e., for diffuse reflection) 
+// Hemisphere sampling (i.e., for diffuse reflection)
 // function "m_Vector HemisphereSampling(m_Vector m_normal)" below
 // calls both m_RND_1 and m_RND_2
 #define m_RND_1 (2.0*m_URD(MersenneTwisterPRNG)-1.0)
@@ -75,7 +75,7 @@ using namespace std;
 // This program has seven classes:
 //
 // m_Vector
-// m_Ray, 
+// m_Ray,
 // m_Object
 // m_Plane
 // m_Sphere
@@ -105,28 +105,28 @@ struct m_Vector {
 // -----------------------------------------
 // RAY Class
 // -----------------------------------------
-struct m_Ray 
+struct m_Ray
 {
-	m_Vector origin, direction; 
+	m_Vector origin, direction;
 
-	m_Ray(m_Vector o0 = 0, m_Vector d0 = 0) 
-	{ 
-		origin = o0, 
-		direction = d0.Normalize(); 
+	m_Ray(m_Vector o0 = 0, m_Vector d0 = 0)
+	{
+		origin = o0,
+		direction = d0.Normalize();
 	}
 };
 
 // -----------------------------------------
 // 3D OBJECT Class
 // -----------------------------------------
-class m_Object 
+class m_Object
 {
 	public:
 	m_Vector color;
 	double emission;
 	double kd, ks, kr;
 
-	void setMaterial(m_Vector cl_ = 0, double emission_ = 0, double kd_ = 0, double ks_ = 0, double kr_ = 0) 
+	void setMaterial(m_Vector cl_ = 0, double emission_ = 0, double kd_ = 0, double ks_ = 0, double kr_ = 0)
 	{ color=cl_; emission=emission_; kd=kd_; ks=ks_; kr=kr_; }
 	virtual double intersect(const m_Ray&) const = 0;
 	virtual m_Vector normal(const m_Vector&) const = 0;
@@ -135,22 +135,22 @@ class m_Object
 // -----------------------------------------
 // PLANE Class
 // -----------------------------------------
-class m_Plane : public m_Object 
+class m_Plane : public m_Object
 {
 	public:
 	double d;
 	m_Vector n;
-	
-	m_Plane(double d_ = 0, m_Vector n_= 0) 
+
+	m_Plane(double d_ = 0, m_Vector n_= 0)
 	{
 		d=d_;
 		n=n_;
 	}
 
-	double intersect(const m_Ray& ray) const 
+	double intersect(const m_Ray& ray) const
 	{
 		double d0 = n.DotProduct(ray.direction);
-		if(d0 != 0) 
+		if(d0 != 0)
 		{
 			double t = -1 * (((n.DotProduct(ray.origin))+d) / d0);
 			return (t > m_eps) ? t : 0.0;
@@ -163,19 +163,19 @@ class m_Plane : public m_Object
 // -----------------------------------------
 // SPHERE Class
 // -----------------------------------------
-class m_Sphere : public m_Object 
+class m_Sphere : public m_Object
 {
 	public:
 	m_Vector center;
 	double radius;
 
-	m_Sphere(double r_= 0, m_Vector c_=0) 
-	{ 
-		center = c_; 
-		radius = r_; 
+	m_Sphere(double r_= 0, m_Vector c_=0)
+	{
+		center = c_;
+		radius = r_;
 	}
 
-	double intersect(const m_Ray& ray) const 
+	double intersect(const m_Ray& ray) const
 	{
 		double b = ((ray.origin-center)*2).DotProduct(ray.direction);
 		double r2 = (radius*radius);
@@ -190,7 +190,7 @@ class m_Sphere : public m_Object
 		return (solution_2 > m_eps) ? solution_2/2 : ((solution_1 > m_eps) ? solution_1/2 : 0);
 	}
 
-	m_Vector normal(const m_Vector& p0) const 
+	m_Vector normal(const m_Vector& p0) const
 	{
 		return (p0 - center).Normalize();
 	}
@@ -199,12 +199,12 @@ class m_Sphere : public m_Object
 // -----------------------------------------
 // INTERSECTION Class
 // -----------------------------------------
-class m_Intersection 
+class m_Intersection
 {
 	public:
 		m_Object* object;
 
-		// parametric distance (between 0.0 and 1.0) along the ray 
+		// parametric distance (between 0.0 and 1.0) along the ray
 		// the value of t indicates how close or far the intersection was deteccted.
 		double t;
 
@@ -221,20 +221,20 @@ class m_Scene {
 	vector<m_Object*> objects;
 
 	public:
-	void add(m_Object* object) 
+	void add(m_Object* object)
 	{
 		objects.push_back(object);
 	}
 
-	m_Intersection intersect(const m_Ray& ray) const 
+	m_Intersection intersect(const m_Ray& ray) const
 	{
 		m_Intersection closestIntersection;
 		// test intersection with all objects in the scene
-		for (auto iter = objects.begin(); iter != objects.end(); ++iter) 
+		for (auto iter = objects.begin(); iter != objects.end(); ++iter)
 		{
 			double t = (*iter)->intersect(ray);
 
-			if (t > m_eps && t < closestIntersection.t) 
+			if (t > m_eps && t < closestIntersection.t)
 			{
 				closestIntersection.t = t;
 				closestIntersection.object = *iter;
@@ -273,40 +273,46 @@ class m_Scene {
 // float range min and max
 //
 // ====================================================
-float GenerateRandomFloat(float min, float max) 
+float GenerateRandomFloat(float min, float max)
 {
 	// YOUR CODE HERE
+   double smallRandomNum = (rand())/(RAND_MAX);
+
+	 float randomNum = max * smallRandomNum + min;
+
+	 return randomNum;
+
 }
 
 
 // ----------------------------------------------------------------------------
 // BuildOrthonormalSystem ()
 //
-// Generating outgoing ray directions by uniform sampling on a hemisphere 
+// Generating outgoing ray directions by uniform sampling on a hemisphere
 //
 // Input: vectors v1 and v2
 // Output: vector v3 so (v1, v2, v3) form an orthonormal system
 //         (assuming v1 is already normalized)
 //
 // ----------------------------------------------------------------------------
-void BuildOrthonormalSystem(const m_Vector& v1, m_Vector& v2, m_Vector& v3) 
+void BuildOrthonormalSystem(const m_Vector& v1, m_Vector& v2, m_Vector& v3)
 {
 	float inverse_length, den;
 
-    if (std::abs(v1.x) > std::abs(v1.y)) 
+    if (std::abs(v1.x) > std::abs(v1.y))
 	{
 		// project to the plane y = 0
 		// construct a normalized orthogonal vector on this plane
 		den = sqrtf(v1.x * v1.x + v1.z * v1.z);
 		inverse_length = 1.f / den;
 		v2 = m_Vector(-v1.z * inverse_length, 0.0f, v1.x * inverse_length);
-    } 
-	else 
+    }
+	else
 	{
-		// project to the plane x = 0 
+		// project to the plane x = 0
 		// construct a normalized orthogonal vector on this plane
 		den = sqrtf(v1.y * v1.y + v1.z * v1.z);
-		inverse_length = 1.0f / den; 
+		inverse_length = 1.0f / den;
 		v2 = m_Vector(0.0f, v1.z * inverse_length, -v1.y * inverse_length);
     }
 
@@ -317,10 +323,10 @@ void BuildOrthonormalSystem(const m_Vector& v1, m_Vector& v2, m_Vector& v3)
 // ----------------------------------------------------------------------------
 // HemisphereSampling ()
 //
-// Generating outgoing ray directions by uniform sampling on a hemisphere 
+// Generating outgoing ray directions by uniform sampling on a hemisphere
 //
 // Input: normal vector at the intersection point
-// Output: outgoing ray direction from uniform sampling on a hemisphere 
+// Output: outgoing ray direction from uniform sampling on a hemisphere
 //
 // ----------------------------------------------------------------------------
 
@@ -340,14 +346,14 @@ m_Vector HemisphereSampling(m_Vector m_normal)
 //
 // Slides #26 and #27
 // Tip: use m_RND_2 for Xi_1 and Xi_2
-// 
+//
 // =================================================================
 	double vx = // YOUR CODE HERE
 	double vy = // YOUR CODE HERE
 	double vz = // YOUR CODE HERE
 	m_Vector sampled_ray_direction = m_Vector(vx, vy, vz);
 
-	// Now we build an otrhotnormal frame system 
+	// Now we build an otrhotnormal frame system
 	// to "rotate" the sampled ray to this system
 	m_Vector v2, v3;
 	BuildOrthonormalSystem (m_normal, v2, v3);
@@ -356,12 +362,12 @@ m_Vector HemisphereSampling(m_Vector m_normal)
 	double vecx = m_Vector(v2.x, v3.x, m_normal.x).DotProduct(sampled_ray_direction);
     double vecy = m_Vector(v2.y, v3.y, m_normal.y).DotProduct(sampled_ray_direction);
     double vecz = m_Vector(v2.z, v3.z, m_normal.z).DotProduct(sampled_ray_direction);
-	m_Vector m_rotated_ray_direction = m_Vector(vecx,vecy,vecz); 
+	m_Vector m_rotated_ray_direction = m_Vector(vecx,vecy,vecz);
 
 	return m_rotated_ray_direction;
 }
 
-	
+
 // Main scene
 m_Scene scene;
 
@@ -377,22 +383,22 @@ m_Scene scene;
 m_Vector ProcessTransmissionRay (m_Vector normal, m_Vector ray_dir)
 {
 	m_Vector final_ray_direction;
-	
+
 	double n = 1.5;
-	double a = 1.0 - n; 
+	double a = 1.0 - n;
 	double b = 1.0 + n;
 	double m_r0 = (a / b) * (a / b);
 
 	if (normal.DotProduct(ray_dir) > 0) // ray is inside the medium
 	{
-		// invert the normal 
+		// invert the normal
 		normal = normal * -1.0;
 		n = 1  / n;
 	}
 
     // cosines of theta 1 and theta 2
 	double cosine_t1 = (normal.DotProduct(ray_dir))*-1;
-	double cosine_t2 = 1.0 - n*n*(1.0-cosine_t1*cosine_t1); 
+	double cosine_t2 = 1.0 - n*n*(1.0-cosine_t1*cosine_t1);
 
 	// Schlick's approximation:
 	// approximates the contribution of the Fresnel factor in the specular reflection of light from a non-conducting interface (surface) between two media
@@ -404,7 +410,7 @@ m_Vector ProcessTransmissionRay (m_Vector normal, m_Vector ray_dir)
 	double r_prob = m_r0 + a*b;
 	m_Vector v1, v2;
 
-	if (cosine_t2 > 0 && m_RND_2 > r_prob) 
+	if (cosine_t2 > 0 && m_RND_2 > r_prob)
 	{
 		// follow the refraction direction
 		v1 = ray_dir * n;
@@ -412,7 +418,7 @@ m_Vector ProcessTransmissionRay (m_Vector normal, m_Vector ray_dir)
 		v2 = v1 + (normal * a);
 		final_ray_direction = v2.Normalize();
 	}
-	else 
+	else
 	{
 		// follow the reflection direction
 		a = 2*cosine_t1;
@@ -433,7 +439,7 @@ m_Vector ProcessTransmissionRay (m_Vector normal, m_Vector ray_dir)
 // Output: color
 //
 // -----------------------------------------
-void m_PathTracer (m_Ray &ray, int depth, m_Vector& color) 
+void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 {
 	// Russian Roulette (rr) strategy
 	// If depth >= 5
@@ -441,7 +447,7 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 	double rr_factor = 1.0;
 	if ((depth >= 5) & (m_RND_2 <= 0.1)) return;
 	rr_factor = 1.0 / (1.0 - 0.1);
-	
+
 	// Find ray intsersection with the scene
 	m_Intersection intersection = scene.intersect(ray);
 	if (!intersection) return;
@@ -462,7 +468,7 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 	//
 	// ktot = (...)?
 	// m_random_float = (...)?
-	// 
+	//
 	// Refer to lecture slide file on Path Tracing:
 	// http://www.cpsc.ucalgary.ca/~mario/teaching/591-691/F16/topics/global/reading/slides/path%20tracing.pdf
 	//
@@ -475,7 +481,7 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 
 	if (m_random_float < intersection.object->kd) // send a diffuse ray
 	{
-	
+
 		// =========================================================================
 		// TO DO Task #4
 		//
@@ -496,10 +502,10 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 		m_PathTracer(ray, depth+1, tmp);
 		color = color + (tmp.Multiply(intersection.object->color)) * cosine_t * 0.1 * rr_factor;
 	}
-	else 
+	else
 		if (m_random_float < (intersection.object->kd + intersection.object->ks)) // send a specular ray
 		{
-			
+
 			double cosine_t = ray.direction.DotProduct(normal_at_hit_point);
 			ray.direction = (ray.direction - normal_at_hit_point*(2*cosine_t)).Normalize();
 			m_Vector tmp_color = m_Vector(0,0,0);
@@ -529,7 +535,7 @@ void AddPlanes()
 	m_d = 5.5; m_normal = m_Vector(0,0,1);
 	m_Plane *m_back_plane = new m_Plane(m_d, m_normal);
 	// Specify color, emission and material coefficients (kd, ks, kr)
-	m_color = m_Vector(6, 6, 6); m_emission = 0; 
+	m_color = m_Vector(6, 6, 6); m_emission = 0;
 	m_kd = 1.0; m_ks = 0.0; m_kr = 0.0;
 	m_back_plane->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
 	// Add plane to the scene
@@ -538,7 +544,7 @@ void AddPlanes()
 	// -- LEFT PLANE
 	m_d = 5.5; m_normal = m_Vector(1,0,0);
 	m_Plane *m_left_plane = new m_Plane(m_d, m_normal);
-	m_color = m_Vector(10, 2, 2); m_emission = 0;  
+	m_color = m_Vector(10, 2, 2); m_emission = 0;
 	m_kd = 1.0; m_ks = 0.0; m_kr = 0.0;
 	m_left_plane->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
 	scene.add(m_left_plane);
@@ -546,7 +552,7 @@ void AddPlanes()
 	// -- RIGHT PLANE
 	m_d = 2.75; m_normal = m_Vector(-1, 0, 0);
 	m_Plane *m_right_plane = new m_Plane(m_d, m_normal);
-	m_color = m_Vector(2,10,2); m_emission = 0; 
+	m_color = m_Vector(2,10,2); m_emission = 0;
 	m_kd = 1.0; m_ks = 0.0; m_kr = 0.0;
 	m_right_plane->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
 	scene.add(m_right_plane);
@@ -554,7 +560,7 @@ void AddPlanes()
 	// -- CEILING PLANE
 	m_d = 3.0; m_normal = m_Vector(0, -1, 0);
 	m_Plane *m_ceiling_plane = new m_Plane(m_d, m_normal);
-	m_color = m_Vector(6,6,6); m_emission = 0; 
+	m_color = m_Vector(6,6,6); m_emission = 0;
 	m_kd = 1.0; m_ks = 0.0; m_kr = 0.0;
 	m_ceiling_plane->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
 	scene.add(m_ceiling_plane);
@@ -562,7 +568,7 @@ void AddPlanes()
 	// -- FLOOR PLANE
 	m_d = 2.5; m_normal = m_Vector(0, 1, 0);
 	m_Plane *m_floor_plane = new m_Plane(m_d, m_normal);
-	m_color = m_Vector(6,6,6); m_emission = 0; 
+	m_color = m_Vector(6,6,6); m_emission = 0;
 	m_kd = 0.0; m_ks = 1.0; m_kr = 0.0;
 	m_floor_plane->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
 	scene.add(m_floor_plane);
@@ -582,7 +588,7 @@ void AddSpheres()
 	m_radius = 1.05; m_position = m_Vector(-0.75,-1.45,-4.4);
 	m_Sphere *m_sphere1 = new m_Sphere(m_radius, m_position);
 	// Specify color, emission and material coefficients (kd, ks, kr)
-	m_color = m_Vector(4,8,4); m_emission = 0; 
+	m_color = m_Vector(4,8,4); m_emission = 0;
 	m_kd = 0.0; m_ks = 1.0; m_kr = 0.0;
 	m_sphere1->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
     // Add sphere to the scene
@@ -590,7 +596,7 @@ void AddSpheres()
 
 	// -- SPHERE #2
 	m_radius = 0.5; m_position = m_Vector(2.0,-2.05,-3.7);
-	m_color = m_Vector(10,10,1); m_emission = 0; 
+	m_color = m_Vector(10,10,1); m_emission = 0;
 	m_kd = 0.7; m_ks = 0.0; m_kr = 0.3;
 	m_Sphere *m_sphere2 = new m_Sphere(m_radius, m_position);
 	m_sphere2->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
@@ -598,7 +604,7 @@ void AddSpheres()
 
 	// -- SPHERE #3
 	m_radius = 0.6; m_position = m_Vector(-1.75,-1.95,-3.1);
-	m_color = m_Vector(10,10,1); m_emission = 0; 
+	m_color = m_Vector(10,10,1); m_emission = 0;
 	m_kd = 0.3; m_ks = 0.7; m_kr = 0.0;
 	m_Sphere *m_sphere3 = new m_Sphere(m_radius, m_position);
 	m_sphere3->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
@@ -618,7 +624,7 @@ void AddSphericalLightSource()
 	m_radius = 0.5; m_position = m_Vector(0,1.9,-3);
 	m_Sphere *m_spherical_light_src = new m_Sphere(m_radius, m_position);
 	// Specify color, emission and material coefficients (kd, ks, kr)
-	m_color = m_Vector(4,8,4); m_emission = 10000; 
+	m_color = m_Vector(4,8,4); m_emission = 10000;
 	m_kd = 1.0; m_ks = 0.0; m_kr = 0.0;
 	m_spherical_light_src->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
     // Add sphere to the scene
@@ -632,7 +638,7 @@ void AddSphericalLightSource()
 // Output coordinate on the image plane
 // -----------------------------------------
 
-m_Vector ImagePlaneCoordinates(const double x, const double y) 
+m_Vector ImagePlaneCoordinates(const double x, const double y)
 {
 	double w = m_pixmap_width;
 	double h = m_pixmap_height;
@@ -659,7 +665,7 @@ int main() {
 
 	// Initialize pixelmap
 	m_Vector **m_pix = new m_Vector*[m_pixmap_width];
-	for(int i = 0; i < m_pixmap_width; i++) 
+	for(int i = 0; i < m_pixmap_width; i++)
 	{
 		m_pix[i] = new m_Vector[m_pixmap_height];
 	}
@@ -670,24 +676,24 @@ int main() {
 	//#pragma omp parallel for schedule(dynamic)
 
 	// for every pixel...
-	for (int col = 0; col < m_pixmap_width; col++) 
+	for (int col = 0; col < m_pixmap_width; col++)
 	{
 		float perc = (float) col/m_pixmap_width*100;
 		fprintf(stdout,"\rRendering: %1.0f Samples per Pixel %8.2f%%",m_samples_per_pixel,(double)perc);
 
-		for(int row = 0; row < m_pixmap_height; row++) 
+		for(int row = 0; row < m_pixmap_height; row++)
 		{
 			// for every sample (i.e. ray) ...
-			for(int s = 0; s < m_samples_per_pixel; s++) 
+			for(int s = 0; s < m_samples_per_pixel; s++)
 			{
 				m_Vector color;
 				m_Ray ray;
 
-				ray.origin = (m_Vector(0,0,0)); 
+				ray.origin = (m_Vector(0,0,0));
 
 				// construct the image plane coordinates
-				m_Vector camera = ImagePlaneCoordinates(col,row); 
-				
+				m_Vector camera = ImagePlaneCoordinates(col,row);
+
 				// =========================================================================
 				// TO DO Task #5
 				//
@@ -706,7 +712,7 @@ int main() {
 				camera.y = // YOUR CODE HERE
 
 				// Ray Direction: point from the origin to the camera plane
-				ray.direction = (camera - ray.origin).Normalize(); 
+				ray.direction = (camera - ray.origin).Normalize();
 
 				m_PathTracer(ray,0,color);
 
@@ -720,9 +726,9 @@ int main() {
 	FILE *f = fopen("path_traced_scene.ppm", "w");
 	fprintf(f, "P3\n%d %d\n%d\n ", m_pixmap_width, m_pixmap_height, 255);
 
-	for (int row = 0; row < m_pixmap_height; row++) 
+	for (int row = 0; row < m_pixmap_height; row++)
 	{
-		for (int col = 0; col < m_pixmap_width; col++) 
+		for (int col = 0; col < m_pixmap_width; col++)
 		{
 			int x = (int)m_pix[col][row].x;
 			int y = (int)m_pix[col][row].y;
