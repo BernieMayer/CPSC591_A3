@@ -67,7 +67,7 @@ const double m_eps=1e-6;
 //    Number of Samples per Pixel
 // -----------------------------------------
 const int m_pixmap_width = 155, m_pixmap_height = 155;
-const double m_samples_per_pixel = 500;
+const double m_samples_per_pixel = 200;
 
 using namespace std;
 
@@ -276,7 +276,7 @@ class m_Scene {
 float GenerateRandomFloat(float min, float max)
 {
 	// YOUR CODE HERE
-   double smallRandomNum = (rand())/(RAND_MAX);
+    double smallRandomNum = m_RND_2;
 
 	 float randomNum = max * smallRandomNum + min;
 
@@ -351,13 +351,13 @@ m_Vector HemisphereSampling(m_Vector m_normal)
 
 	double gamma1 = GenerateRandomFloat(0.0, 1.0);
 	double gamma2 = GenerateRandomFloat(0.0, 1.0);
-	double r = sqrt(1.0 - m_RND_2 * m_RND_2);
-	double phi = 2.0 * m_PI * m_RND_2;
+	double r = sqrt(1.0 - gamma1 * gamma1);
+	double phi = 2.0 * m_PI * gamma2;
 
 
 	double vx = cos(phi) * r;
 	double vy = sin(phi) * r;
-	double vz = m_RND_2;
+	double vz = gamma1;
 	m_Vector sampled_ray_direction = m_Vector(vx, vy, vz);
 
 	// Now we build an otrhotnormal frame system
@@ -502,7 +502,7 @@ void m_PathTracer (m_Ray &ray, int depth, m_Vector& color)
 		// Slides #26 and #27
 		// =========================================================================
 
-		ray.direction = HemisphereSampling(intersection.object->normal(hit_point));
+		ray.direction = HemisphereSampling(normal_at_hit_point);
 
 		double cosine_t = ray.direction.DotProduct(normal_at_hit_point);
 		m_Vector tmp;
@@ -607,7 +607,7 @@ void AddSpheres()
 	m_kd = 0.7; m_ks = 0.0; m_kr = 0.3;
 	m_Sphere *m_sphere2 = new m_Sphere(m_radius, m_position);
 	m_sphere2->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
-	//scene.add(m_sphere2);
+	scene.add(m_sphere2);
 
 	// -- SPHERE #3
 	m_radius = 0.6; m_position = m_Vector(-1.75,-1.95,-3.1);
@@ -615,7 +615,7 @@ void AddSpheres()
 	m_kd = 0.3; m_ks = 0.7; m_kr = 0.0;
 	m_Sphere *m_sphere3 = new m_Sphere(m_radius, m_position);
 	m_sphere3->setMaterial(m_color, m_emission, m_kd, m_ks, m_kr);
-	//scene.add(m_sphere3);
+	scene.add(m_sphere3);
 }
 
 // -----------------------------------------
@@ -680,7 +680,7 @@ int main() {
 	// start timing...
 	clock_t start = clock();
 
-	//#pragma omp parallel for schedule(dynamic)
+	#pragma omp parallel for schedule(dynamic)
 
 	// for every pixel...
 	for (int col = 0; col < m_pixmap_width; col++)
@@ -715,8 +715,8 @@ int main() {
 				// Slide #20
 				//
 				// =================================================================
-				camera.x = camera.x + (m_RND_2/1000);
-				camera.y = camera.y + (m_RND_2/1000);
+				camera.x = camera.x + (m_RND_1/1000);
+				camera.y = camera.y + (m_RND_1/1000);
 
 				// Ray Direction: point from the origin to the camera plane
 				ray.direction = (camera - ray.origin).Normalize();
